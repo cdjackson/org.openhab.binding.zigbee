@@ -7,6 +7,8 @@
  */
 package org.openhab.binding.zigbee.converter;
 
+import java.util.concurrent.ExecutionException;
+
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.library.types.PercentType;
 import org.eclipse.smarthome.core.thing.Channel;
@@ -97,9 +99,24 @@ public class ZigBeeConverterColorTemperature extends ZigBeeBaseChannelConverter 
 
     @Override
     public Channel getChannel(ThingUID thingUID, ZigBeeEndpoint endpoint) {
-        if (endpoint.getInputCluster(ZclColorControlCluster.CLUSTER_ID) == null) {
+        clusterColorControl = (ZclColorControlCluster) endpoint.getInputCluster(ZclColorControlCluster.CLUSTER_ID);
+        if (clusterColorControl == null) {
             return null;
         }
+
+        try {
+            if(!clusterColorControl.discoverAttributes(false).get()) {
+                logger.warn("{}: Cannot determine whether device endpoint supports color temperature. Assuming it does", endpoint.getEndpointAddress());
+            }
+            else if(!clusterColorControl.getSupportedAttributes().contains(ZclColorControlCluster.ATTR_COLORTEMPERATURE)) {
+                logger.debug("{}: Device endpoint does not support color temperature (probably only RGB color)", endpoint.getEndpointAddress());
+                return null;
+            }
+	}
+	catch (InterruptedException | ExecutionException e) {
+                logger.warn("{}: Exception checking whether device endpoint supports color temperature. Assuming it does", endpoint.getEndpointAddress(), e);
+	}
+
         return createChannel(thingUID, endpoint, ZigBeeBindingConstants.CHANNEL_COLOR_TEMPERATURE,
                 ZigBeeBindingConstants.ITEM_TYPE_DIMMER, "Color Temperature");
     }
@@ -110,8 +127,8 @@ public class ZigBeeConverterColorTemperature extends ZigBeeBaseChannelConverter 
         if (attribute.getCluster() == ZclClusterType.COLOR_CONTROL
                 && attribute.getId() == ZclColorControlCluster.ATTR_COLORTEMPERATURE) {
             Integer value = (Integer) attribute.getLastValue();
-            if (value != null) {
-            }
+            PercentType colorTemp = new PercentType(Double.valueOf((1e6 / value - 2000.0) * 100.0 / 4500.0).toString());
+            updateChannelState(colorTemp);
         }
     }
 
