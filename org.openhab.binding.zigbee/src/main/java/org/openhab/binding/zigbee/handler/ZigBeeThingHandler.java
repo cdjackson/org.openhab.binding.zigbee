@@ -82,6 +82,8 @@ import com.zsmartsystems.zigbee.app.otaserver.ZclOtaUpgradeServer;
 import com.zsmartsystems.zigbee.app.otaserver.ZigBeeOtaFile;
 import com.zsmartsystems.zigbee.app.otaserver.ZigBeeOtaServerStatus;
 import com.zsmartsystems.zigbee.app.otaserver.ZigBeeOtaStatusCallback;
+import com.zsmartsystems.zigbee.zcl.ZclAttribute;
+import com.zsmartsystems.zigbee.zcl.ZclCluster;
 import com.zsmartsystems.zigbee.zcl.clusters.ZclOtaUpgradeCluster;
 import com.zsmartsystems.zigbee.zdo.field.NeighborTable;
 import com.zsmartsystems.zigbee.zdo.field.RoutingTable;
@@ -564,20 +566,35 @@ public class ZigBeeThingHandler extends BaseThingHandler implements ZigBeeNetwor
                 try {
                     logger.debug("{}: Polling...", nodeIeeeAddress);
 
+                    // First build a Map of all attributes by endpoint
+                    Map<ZclCluster, List<Integer>> clusterAttributes = new HashMap<>();
                     for (ChannelUID channelUid : channels.keySet()) {
                         if (!thingChannelsPoll.contains(channelUid)) {
                             // Don't poll if this channel isn't linked
+                            logger.debug("{}: Polling {} deferred as not linked", nodeIeeeAddress, channelUid);
+                            continue;
+                        }
+
+                        ZigBeeBaseChannelConverter converter = channels.get(channelUid);
+                        if (converter == null) {
+                            logger.debug("{}: Polling {} aborted as no converter found", nodeIeeeAddress, channelUid);
                             continue;
                         }
 
                         logger.debug("{}: Polling {}", nodeIeeeAddress, channelUid);
-                        ZigBeeBaseChannelConverter converter = channels.get(channelUid);
-                        if (converter == null) {
-                            logger.debug("{}: Polling aborted as no converter found for {}", nodeIeeeAddress,
-                                    channelUid);
-                        } else {
-                            converter.handleRefresh();
+                        for (ZclAttribute attribute : converter.getPolledAttributes()) {
+                            List<Integer> attributes = clusterAttributes.get(attribute.getCluster());
+                            if (attributes == null) {
+                                attributes = new ArrayList<>();
+                                clusterAttributes.put(attribute.getCluster(), attributes);
+                            }
+                            attributes.add(attribute.getId());
                         }
+                    }
+
+                    // Then read all attributes per cluster
+                    for (Entry<ZclCluster, List<Integer>> entry : clusterAttributes.entrySet()) {
+                        entry.getKey().readAttributes(entry.getValue()).get();
                     }
                 } catch (Exception e) {
                     logger.warn("{}: Polling aborted due to exception ", nodeIeeeAddress, e);
@@ -601,7 +618,7 @@ public class ZigBeeThingHandler extends BaseThingHandler implements ZigBeeNetwor
             // Polling starts almost immediately to get an immediate refresh
             // Add some random element to the period so that all things aren't synchronised
             int pollingPeriodMs = pollingPeriod * 1000 + new Random().nextInt(pollingPeriod * 100);
-            pollingJob = scheduler.scheduleAtFixedRate(pollingRunnable, new Random().nextInt(pollingPeriodMs),
+            pollingJob = scheduler.scheduleWithFixedDelay(pollingRunnable, new Random().nextInt(pollingPeriodMs),
                     pollingPeriodMs, TimeUnit.MILLISECONDS);
             logger.debug("{}: Polling initialised at {}ms", nodeIeeeAddress, pollingPeriodMs);
         }

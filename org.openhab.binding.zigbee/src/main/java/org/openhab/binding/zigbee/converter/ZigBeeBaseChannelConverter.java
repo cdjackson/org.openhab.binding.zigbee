@@ -15,8 +15,10 @@ package org.openhab.binding.zigbee.converter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Future;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -43,6 +45,7 @@ import com.zsmartsystems.zigbee.CommandResult;
 import com.zsmartsystems.zigbee.IeeeAddress;
 import com.zsmartsystems.zigbee.ZigBeeEndpoint;
 import com.zsmartsystems.zigbee.ZigBeeProfileType;
+import com.zsmartsystems.zigbee.zcl.ZclAttribute;
 import com.zsmartsystems.zigbee.zcl.ZclCluster;
 
 /**
@@ -161,6 +164,8 @@ public abstract class ZigBeeBaseChannelConverter {
      * be used, however it is recommended to use these standard settings.
      */
     protected int pollingPeriod = POLLING_PERIOD_DEFAULT;
+
+    private final Set<ZclAttribute> polledAttributes = new HashSet<>();
 
     /**
      * The smallest of all maximum reporting periods configured for the attributes used by the converter. By default it
@@ -463,5 +468,23 @@ public abstract class ZigBeeBaseChannelConverter {
     protected Future<CommandResult> bind(ZclCluster cluster) {
         return cluster.bind(coordinator.getLocalIeeeAddress(),
                 coordinator.getLocalEndpointId(ZigBeeProfileType.ZIGBEE_HOME_AUTOMATION));
+    }
+
+    /**
+     * Adds a {@link ZclAttribute} to the list of attributes to be polled
+     * 
+     * @param attribute the {@link ZclAttribute} to be polled
+     */
+    protected void addPolledAttribute(ZclAttribute attribute) {
+        polledAttributes.add(attribute);
+    }
+
+    /**
+     * Gets the list of {@link ZclAttribute}s to be polled
+     * 
+     * @return
+     */
+    public Set<ZclAttribute> getPolledAttributes() {
+        return polledAttributes;
     }
 }
