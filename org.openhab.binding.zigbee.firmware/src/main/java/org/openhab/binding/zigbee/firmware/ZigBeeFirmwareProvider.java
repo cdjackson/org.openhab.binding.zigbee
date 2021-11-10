@@ -24,8 +24,8 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.zigbee.firmware.internal.DirectoryFileEntry;
 import org.openhab.binding.zigbee.firmware.internal.GithubLibraryReader;
+import org.openhab.binding.zigbee.handler.ZigBeeBaseThingHandler;
 import org.openhab.binding.zigbee.handler.ZigBeeFirmwareVersion;
-import org.openhab.binding.zigbee.handler.ZigBeeThingHandler;
 import org.openhab.core.OpenHAB;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingTypeUID;
@@ -116,10 +116,10 @@ public class ZigBeeFirmwareProvider implements FirmwareProvider {
 
     private ZigBeeFirmwareVersion getRequestedVersionFromThing(@NonNull Thing thing) {
         // We only deal in ZigBee devices here
-        if (!(thing.getHandler() instanceof ZigBeeThingHandler)) {
+        if (!(thing.getHandler() instanceof ZigBeeBaseThingHandler)) {
             return null;
         }
-        ZigBeeThingHandler zigbeeHandler = (ZigBeeThingHandler) thing.getHandler();
+        ZigBeeBaseThingHandler zigbeeHandler = (ZigBeeBaseThingHandler) thing.getHandler();
         if (zigbeeHandler == null) {
             return null;
         }

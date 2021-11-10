@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2024 Contributors to the openHAB project
+ * Copyright (c) 2010-2021 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -18,7 +18,7 @@ import java.util.concurrent.ExecutionException;
 
 import org.openhab.binding.zigbee.ZigBeeBindingConstants;
 import org.openhab.binding.zigbee.converter.ZigBeeBaseChannelConverter;
-import org.openhab.binding.zigbee.handler.ZigBeeThingHandler;
+import org.openhab.binding.zigbee.handler.ZigBeeBaseThingHandler;
 import org.openhab.core.thing.Channel;
 import org.openhab.core.thing.ThingUID;
 import org.openhab.core.thing.binding.builder.ChannelBuilder;
@@ -79,7 +79,7 @@ public class ZigBeeConverterTemperature extends ZigBeeBaseChannelConverter imple
                 // Configure reporting
                 ZclAttribute attribute = serverCluster
                         .getAttribute(ZclTemperatureMeasurementCluster.ATTR_MEASUREDVALUE);
-                CommandResult reportingResponse = attribute.setReporting(1, REPORTING_PERIOD_DEFAULT_MAX, 10).get();
+                CommandResult reportingResponse = attribute.setReporting(1, REPORTING_PERIOD_DEFAULT_MAX, 0.1).get();
                 handleReportingResponse(reportingResponse, POLLING_PERIOD_DEFAULT, REPORTING_PERIOD_DEFAULT_MAX);
             } else {
                 logger.debug("{}: Failed to bind temperature measurement cluster", endpoint.getIeeeAddress());
@@ -93,7 +93,7 @@ public class ZigBeeConverterTemperature extends ZigBeeBaseChannelConverter imple
     }
 
     @Override
-    public boolean initializeConverter(ZigBeeThingHandler thing) {
+    public boolean initializeConverter(ZigBeeBaseThingHandler thing) {
         super.initializeConverter(thing);
         cluster = (ZclTemperatureMeasurementCluster) endpoint
                 .getInputCluster(ZclTemperatureMeasurementCluster.CLUSTER_ID);

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2024 Contributors to the openHAB project
+ * Copyright (c) 2010-2021 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -20,7 +20,7 @@ import java.util.concurrent.ExecutionException;
 
 import org.openhab.binding.zigbee.ZigBeeBindingConstants;
 import org.openhab.binding.zigbee.converter.ZigBeeBaseChannelConverter;
-import org.openhab.binding.zigbee.handler.ZigBeeThingHandler;
+import org.openhab.binding.zigbee.handler.ZigBeeBaseThingHandler;
 import org.openhab.core.library.types.DecimalType;
 import org.openhab.core.thing.Channel;
 import org.openhab.core.thing.ThingUID;
@@ -89,7 +89,7 @@ public class ZigBeeConverterBatteryPercent extends ZigBeeBaseChannelConverter im
     }
 
     @Override
-    public boolean initializeConverter(ZigBeeThingHandler thing) {
+    public boolean initializeConverter(ZigBeeBaseThingHandler thing) {
         super.initializeConverter(thing);
         cluster = (ZclPowerConfigurationCluster) endpoint.getInputCluster(ZclPowerConfigurationCluster.CLUSTER_ID);
         if (cluster == null) {
@@ -123,8 +123,21 @@ public class ZigBeeConverterBatteryPercent extends ZigBeeBaseChannelConverter im
             return null;
         }
 
-        if (powerCluster.getBatteryPercentageRemaining(Long.MAX_VALUE) == null) {
-            logger.trace("{}: Power configuration cluster battery percentage returned null", endpoint.getIeeeAddress());
+        try {
+            if (!powerCluster.discoverAttributes(false).get() && !powerCluster
+                    .isAttributeSupported(ZclPowerConfigurationCluster.ATTR_BATTERYPERCENTAGEREMAINING)) {
+                logger.trace("{}: Power configuration cluster battery percentage not supported",
+                        endpoint.getIeeeAddress());
+
+                return null;
+            } else if (powerCluster.getBatteryPercentageRemaining(Long.MAX_VALUE) == null) {
+                logger.trace("{}: Power configuration cluster battery percentage returned null",
+                        endpoint.getIeeeAddress());
+                return null;
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            logger.warn("{}: Exception discovering attributes in power configuration cluster",
+                    endpoint.getIeeeAddress(), e);
             return null;
         }
 

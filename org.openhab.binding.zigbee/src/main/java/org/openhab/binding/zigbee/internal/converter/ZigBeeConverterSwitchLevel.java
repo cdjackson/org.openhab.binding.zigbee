@@ -28,7 +28,7 @@ import java.util.stream.Stream;
 import org.eclipse.jdt.annotation.NonNull;
 import org.openhab.binding.zigbee.ZigBeeBindingConstants;
 import org.openhab.binding.zigbee.converter.ZigBeeBaseChannelConverter;
-import org.openhab.binding.zigbee.handler.ZigBeeThingHandler;
+import org.openhab.binding.zigbee.handler.ZigBeeBaseThingHandler;
 import org.openhab.binding.zigbee.internal.converter.config.ZclLevelControlConfig;
 import org.openhab.binding.zigbee.internal.converter.config.ZclOnOffSwitchConfig;
 import org.openhab.binding.zigbee.internal.converter.config.ZclReportingConfig;
@@ -236,7 +236,7 @@ public class ZigBeeConverterSwitchLevel extends ZigBeeBaseChannelConverter
     }
 
     @Override
-    public synchronized boolean initializeConverter(ZigBeeThingHandler thing) {
+    public synchronized boolean initializeConverter(ZigBeeBaseThingHandler thing) {
         super.initializeConverter(thing);
 
         updateScheduler = Executors.newSingleThreadScheduledExecutor();

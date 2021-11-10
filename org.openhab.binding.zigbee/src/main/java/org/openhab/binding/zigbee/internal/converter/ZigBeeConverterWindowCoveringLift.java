@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2024 Contributors to the openHAB project
+ * Copyright (c) 2010-2021 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -19,7 +19,7 @@ import java.util.concurrent.ExecutionException;
 
 import org.openhab.binding.zigbee.ZigBeeBindingConstants;
 import org.openhab.binding.zigbee.converter.ZigBeeBaseChannelConverter;
-import org.openhab.binding.zigbee.handler.ZigBeeThingHandler;
+import org.openhab.binding.zigbee.handler.ZigBeeBaseThingHandler;
 import org.openhab.binding.zigbee.internal.converter.config.ZclReportingConfig;
 import org.openhab.core.library.types.PercentType;
 import org.openhab.core.library.types.StopMoveType;
@@ -101,7 +101,7 @@ public class ZigBeeConverterWindowCoveringLift extends ZigBeeBaseChannelConverte
     }
 
     @Override
-    public boolean initializeConverter(ZigBeeThingHandler thing) {
+    public boolean initializeConverter(ZigBeeBaseThingHandler thing) {
         super.initializeConverter(thing);
         clusterServer = (ZclWindowCoveringCluster) endpoint.getInputCluster(ZclWindowCoveringCluster.CLUSTER_ID);
         if (clusterServer == null) {
@@ -177,7 +177,7 @@ public class ZigBeeConverterWindowCoveringLift extends ZigBeeBaseChannelConverte
             return;
         }
 
-        monitorCommandResponse(command, clusterServer.sendCommand(zclCommand));
+        clusterServer.sendCommand(zclCommand);
     }
 
     @Override

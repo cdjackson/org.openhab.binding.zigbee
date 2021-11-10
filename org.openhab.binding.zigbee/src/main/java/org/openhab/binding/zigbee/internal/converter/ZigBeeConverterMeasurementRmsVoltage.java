@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2024 Contributors to the openHAB project
+ * Copyright (c) 2010-2021 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -21,7 +21,7 @@ import javax.measure.quantity.ElectricPotential;
 
 import org.openhab.binding.zigbee.ZigBeeBindingConstants;
 import org.openhab.binding.zigbee.converter.ZigBeeBaseChannelConverter;
-import org.openhab.binding.zigbee.handler.ZigBeeThingHandler;
+import org.openhab.binding.zigbee.handler.ZigBeeBaseThingHandler;
 import org.openhab.core.library.types.QuantityType;
 import org.openhab.core.library.unit.Units;
 import org.openhab.core.thing.Channel;
@@ -93,7 +93,7 @@ public class ZigBeeConverterMeasurementRmsVoltage extends ZigBeeBaseChannelConve
     }
 
     @Override
-    public boolean initializeConverter(ZigBeeThingHandler thing) {
+    public boolean initializeConverter(ZigBeeBaseThingHandler thing) {
         super.initializeConverter(thing);
         clusterMeasurement = (ZclElectricalMeasurementCluster) endpoint
                 .getInputCluster(ZclElectricalMeasurementCluster.CLUSTER_ID);
@@ -166,13 +166,8 @@ public class ZigBeeConverterMeasurementRmsVoltage extends ZigBeeBaseChannelConve
     }
 
     private void determineDivisorAndMultiplier(ZclElectricalMeasurementCluster serverClusterMeasurement) {
-        ZclAttribute divAttribute = serverClusterMeasurement
-                .getAttribute(ZclElectricalMeasurementCluster.ATTR_ACPOWERDIVISOR);
-        ZclAttribute mulAttribute = serverClusterMeasurement
-                .getAttribute(ZclElectricalMeasurementCluster.ATTR_ACPOWERMULTIPLIER);
-
-        divisor = (Integer) divAttribute.readValue(Long.MAX_VALUE);
-        multiplier = (Integer) mulAttribute.readValue(Long.MAX_VALUE);
+        divisor = serverClusterMeasurement.getAcPowerDivisor(Long.MAX_VALUE);
+        multiplier = serverClusterMeasurement.getAcPowerMultiplier(Long.MAX_VALUE);
         if (divisor == null || multiplier == null) {
             divisor = 1;
             multiplier = 1;

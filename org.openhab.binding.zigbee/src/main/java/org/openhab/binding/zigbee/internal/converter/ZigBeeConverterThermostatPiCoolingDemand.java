@@ -22,7 +22,7 @@ import java.util.concurrent.ExecutionException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.openhab.binding.zigbee.ZigBeeBindingConstants;
 import org.openhab.binding.zigbee.converter.ZigBeeBaseChannelConverter;
-import org.openhab.binding.zigbee.handler.ZigBeeThingHandler;
+import org.openhab.binding.zigbee.handler.ZigBeeBaseThingHandler;
 import org.openhab.binding.zigbee.internal.converter.config.ZclReportingConfig;
 import org.openhab.core.config.core.Configuration;
 import org.openhab.core.thing.Channel;
@@ -98,7 +98,7 @@ public class ZigBeeConverterThermostatPiCoolingDemand extends ZigBeeBaseChannelC
     }
 
     @Override
-    public boolean initializeConverter(ZigBeeThingHandler thing) {
+    public boolean initializeConverter(ZigBeeBaseThingHandler thing) {
         super.initializeConverter(thing);
         cluster = (ZclThermostatCluster) endpoint.getInputCluster(ZclThermostatCluster.CLUSTER_ID);
         if (cluster == null) {

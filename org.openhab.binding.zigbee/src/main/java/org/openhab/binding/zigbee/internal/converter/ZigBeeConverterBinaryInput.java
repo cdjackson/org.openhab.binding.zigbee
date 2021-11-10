@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2024 Contributors to the openHAB project
+ * Copyright (c) 2010-2021 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -18,7 +18,7 @@ import java.util.concurrent.ExecutionException;
 
 import org.openhab.binding.zigbee.ZigBeeBindingConstants;
 import org.openhab.binding.zigbee.converter.ZigBeeBaseChannelConverter;
-import org.openhab.binding.zigbee.handler.ZigBeeThingHandler;
+import org.openhab.binding.zigbee.handler.ZigBeeBaseThingHandler;
 import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.thing.Channel;
 import org.openhab.core.thing.ThingUID;
@@ -81,7 +81,7 @@ public class ZigBeeConverterBinaryInput extends ZigBeeBaseChannelConverter imple
     }
 
     @Override
-    public boolean initializeConverter(ZigBeeThingHandler thing) {
+    public boolean initializeConverter(ZigBeeBaseThingHandler thing) {
         super.initializeConverter(thing);
         binaryInputCluster = (ZclBinaryInputBasicCluster) endpoint
                 .getInputCluster(ZclBinaryInputBasicCluster.CLUSTER_ID);
@@ -124,7 +124,7 @@ public class ZigBeeConverterBinaryInput extends ZigBeeBaseChannelConverter imple
     @Override
     public void attributeUpdated(ZclAttribute attribute, Object val) {
         logger.debug("{}: ZigBee attribute reports {}", endpoint.getIeeeAddress(), attribute);
-        if (attribute.getClusterType() == ZclClusterType.BINARY_INPUT_BASIC
+        if (attribute.getCluster() == ZclClusterType.BINARY_INPUT_BASIC
                 && attribute.getId() == ZclBinaryInputBasicCluster.ATTR_PRESENTVALUE) {
             Boolean value = (Boolean) val;
             if (value == Boolean.TRUE) {

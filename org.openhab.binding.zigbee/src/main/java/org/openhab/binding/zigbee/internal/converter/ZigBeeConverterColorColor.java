@@ -30,7 +30,7 @@ import java.util.stream.Stream;
 import org.eclipse.jdt.annotation.NonNull;
 import org.openhab.binding.zigbee.ZigBeeBindingConstants;
 import org.openhab.binding.zigbee.converter.ZigBeeBaseChannelConverter;
-import org.openhab.binding.zigbee.handler.ZigBeeThingHandler;
+import org.openhab.binding.zigbee.handler.ZigBeeBaseThingHandler;
 import org.openhab.binding.zigbee.internal.converter.config.ZclColorControlConfig;
 import org.openhab.binding.zigbee.internal.converter.config.ZclColorControlConfig.ControlMethod;
 import org.openhab.binding.zigbee.internal.converter.config.ZclLevelControlConfig;
@@ -213,7 +213,7 @@ public class ZigBeeConverterColorColor extends ZigBeeBaseChannelConverter implem
     }
 
     @Override
-    public boolean initializeConverter(ZigBeeThingHandler thing) {
+    public boolean initializeConverter(ZigBeeBaseThingHandler thing) {
         super.initializeConverter(thing);
         colorUpdateScheduler = Executors.newSingleThreadScheduledExecutor();
         clusterColorControl = (ZclColorControlCluster) endpoint.getInputCluster(ZclColorControlCluster.CLUSTER_ID);

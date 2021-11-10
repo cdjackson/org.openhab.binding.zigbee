@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2024 Contributors to the openHAB project
+ * Copyright (c) 2010-2021 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -22,7 +22,7 @@ import java.util.concurrent.ExecutionException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.openhab.binding.zigbee.ZigBeeBindingConstants;
 import org.openhab.binding.zigbee.converter.ZigBeeBaseChannelConverter;
-import org.openhab.binding.zigbee.handler.ZigBeeThingHandler;
+import org.openhab.binding.zigbee.handler.ZigBeeBaseThingHandler;
 import org.openhab.binding.zigbee.internal.converter.config.ZclReportingConfig;
 import org.openhab.core.config.core.Configuration;
 import org.openhab.core.library.types.DecimalType;
@@ -96,7 +96,7 @@ public class ZigBeeConverterIlluminance extends ZigBeeBaseChannelConverter imple
     }
 
     @Override
-    public boolean initializeConverter(ZigBeeThingHandler thing) {
+    public boolean initializeConverter(ZigBeeBaseThingHandler thing) {
         super.initializeConverter(thing);
         cluster = (ZclIlluminanceMeasurementCluster) endpoint
                 .getInputCluster(ZclIlluminanceMeasurementCluster.CLUSTER_ID);

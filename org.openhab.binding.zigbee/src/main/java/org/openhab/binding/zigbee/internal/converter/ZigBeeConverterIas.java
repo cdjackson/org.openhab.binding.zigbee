@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2024 Contributors to the openHAB project
+ * Copyright (c) 2010-2021 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.openhab.binding.zigbee.converter.ZigBeeBaseChannelConverter;
-import org.openhab.binding.zigbee.handler.ZigBeeThingHandler;
+import org.openhab.binding.zigbee.handler.ZigBeeBaseThingHandler;
 import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.library.types.OpenClosedType;
 import org.slf4j.Logger;
@@ -104,7 +104,7 @@ public abstract class ZigBeeConverterIas extends ZigBeeBaseChannelConverter
     }
 
     @Override
-    public boolean initializeConverter(ZigBeeThingHandler thing) {
+    public boolean initializeConverter(ZigBeeBaseThingHandler thing) {
         super.initializeConverter(thing);
         logger.debug("{}: Initialising device IAS Zone cluster for {}", endpoint.getIeeeAddress(),
                 channel.getChannelTypeUID());
@@ -182,7 +182,7 @@ public abstract class ZigBeeConverterIas extends ZigBeeBaseChannelConverter
     @Override
     public void attributeUpdated(ZclAttribute attribute, Object val) {
         logger.debug("{}: ZigBee attribute reports {}", endpoint.getIeeeAddress(), attribute);
-        if (attribute.getClusterType() == ZclClusterType.IAS_ZONE
+        if (attribute.getCluster() == ZclClusterType.IAS_ZONE
                 && attribute.getId() == ZclIasZoneCluster.ATTR_ZONESTATUS) {
             updateChannelState((Integer) val);
         }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2024 Contributors to the openHAB project
+ * Copyright (c) 2010-2021 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -21,7 +21,7 @@ import javax.measure.quantity.Power;
 
 import org.openhab.binding.zigbee.ZigBeeBindingConstants;
 import org.openhab.binding.zigbee.converter.ZigBeeBaseChannelConverter;
-import org.openhab.binding.zigbee.handler.ZigBeeThingHandler;
+import org.openhab.binding.zigbee.handler.ZigBeeBaseThingHandler;
 import org.openhab.core.library.types.QuantityType;
 import org.openhab.core.library.unit.Units;
 import org.openhab.core.thing.Channel;
@@ -46,7 +46,6 @@ public class ZigBeeConverterMeasurementPower extends ZigBeeBaseChannelConverter 
     private Logger logger = LoggerFactory.getLogger(ZigBeeConverterMeasurementPower.class);
 
     private ZclElectricalMeasurementCluster clusterMeasurement;
-    private ZclAttribute attribute;
 
     private Integer divisor;
     private Integer multiplier;
@@ -75,10 +74,11 @@ public class ZigBeeConverterMeasurementPower extends ZigBeeBaseChannelConverter 
         try {
             CommandResult bindResponse = bind(serverClusterMeasurement).get();
             if (bindResponse.isSuccess()) {
-                // Configure reporting
                 ZclAttribute attribute = serverClusterMeasurement
                         .getAttribute(ZclElectricalMeasurementCluster.ATTR_ACTIVEPOWER);
-                CommandResult reportingResponse = attribute.setReporting(3, REPORTING_PERIOD_DEFAULT_MAX, 1L).get();
+                // Configure reporting - no faster than once per second - no slower than 2 hours.
+                CommandResult reportingResponse = serverClusterMeasurement
+                        .setReporting(attribute, 3, REPORTING_PERIOD_DEFAULT_MAX, 1).get();
                 handleReportingResponse(reportingResponse, POLLING_PERIOD_HIGH, REPORTING_PERIOD_DEFAULT_MAX);
             } else {
                 pollingPeriod = POLLING_PERIOD_HIGH;
@@ -92,18 +92,12 @@ public class ZigBeeConverterMeasurementPower extends ZigBeeBaseChannelConverter 
     }
 
     @Override
-    public boolean initializeConverter(ZigBeeThingHandler thing) {
+    public boolean initializeConverter(ZigBeeBaseThingHandler thing) {
         super.initializeConverter(thing);
         clusterMeasurement = (ZclElectricalMeasurementCluster) endpoint
                 .getInputCluster(ZclElectricalMeasurementCluster.CLUSTER_ID);
         if (clusterMeasurement == null) {
             logger.error("{}: Error opening electrical measurement cluster", endpoint.getIeeeAddress());
-            return false;
-        }
-
-        attribute = clusterMeasurement.getAttribute(ZclElectricalMeasurementCluster.ATTR_ACTIVEPOWER);
-        if (attribute == null) {
-            logger.error("{}: Error opening device measured value attribute", endpoint.getIeeeAddress());
             return false;
         }
 
@@ -123,7 +117,7 @@ public class ZigBeeConverterMeasurementPower extends ZigBeeBaseChannelConverter 
 
     @Override
     public void handleRefresh() {
-        attribute.readValue(0);
+        clusterMeasurement.getActivePower(0);
     }
 
     @Override
@@ -135,10 +129,21 @@ public class ZigBeeConverterMeasurementPower extends ZigBeeBaseChannelConverter 
             return null;
         }
 
-        ZclAttribute attribute = cluster.getAttribute(ZclElectricalMeasurementCluster.ATTR_ACTIVEPOWER);
-        Object value = attribute.readValue(Long.MAX_VALUE);
-        if (value == null) {
-            logger.trace("{}: Electrical measurement cluster active power returned null", endpoint.getIeeeAddress());
+        try {
+            if (!cluster.discoverAttributes(false).get()
+                    && !cluster.isAttributeSupported(ZclElectricalMeasurementCluster.ATTR_ACTIVEPOWER)) {
+                logger.trace("{}: Electrical measurement cluster active power not supported",
+                        endpoint.getIeeeAddress());
+
+                return null;
+            } else if (cluster.getActivePower(Long.MAX_VALUE) == null) {
+                logger.trace("{}: Electrical measurement cluster active power returned null",
+                        endpoint.getIeeeAddress());
+                return null;
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            logger.warn("{}: Exception discovering attributes in electrical measurement cluster",
+                    endpoint.getIeeeAddress(), e);
             return null;
         }
 
@@ -163,13 +168,8 @@ public class ZigBeeConverterMeasurementPower extends ZigBeeBaseChannelConverter 
     }
 
     private void determineDivisorAndMultiplier(ZclElectricalMeasurementCluster serverClusterMeasurement) {
-        ZclAttribute divAttribute = serverClusterMeasurement
-                .getAttribute(ZclElectricalMeasurementCluster.ATTR_ACPOWERDIVISOR);
-        ZclAttribute mulAttribute = serverClusterMeasurement
-                .getAttribute(ZclElectricalMeasurementCluster.ATTR_ACPOWERMULTIPLIER);
-
-        divisor = (Integer) divAttribute.readValue(Long.MAX_VALUE);
-        multiplier = (Integer) mulAttribute.readValue(Long.MAX_VALUE);
+        divisor = serverClusterMeasurement.getAcPowerDivisor(Long.MAX_VALUE);
+        multiplier = serverClusterMeasurement.getAcPowerMultiplier(Long.MAX_VALUE);
         if (divisor == null || multiplier == null) {
             divisor = 1;
             multiplier = 1;

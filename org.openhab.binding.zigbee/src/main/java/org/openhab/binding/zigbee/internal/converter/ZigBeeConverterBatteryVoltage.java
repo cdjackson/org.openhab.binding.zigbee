@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2024 Contributors to the openHAB project
+ * Copyright (c) 2010-2021 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -21,7 +21,7 @@ import javax.measure.quantity.ElectricPotential;
 
 import org.openhab.binding.zigbee.ZigBeeBindingConstants;
 import org.openhab.binding.zigbee.converter.ZigBeeBaseChannelConverter;
-import org.openhab.binding.zigbee.handler.ZigBeeThingHandler;
+import org.openhab.binding.zigbee.handler.ZigBeeBaseThingHandler;
 import org.openhab.core.library.types.QuantityType;
 import org.openhab.core.library.unit.Units;
 import org.openhab.core.thing.Channel;
@@ -47,7 +47,6 @@ public class ZigBeeConverterBatteryVoltage extends ZigBeeBaseChannelConverter im
     private Logger logger = LoggerFactory.getLogger(ZigBeeConverterBatteryVoltage.class);
 
     private ZclPowerConfigurationCluster cluster;
-    private ZclAttribute attribute;
 
     @Override
     public Set<Integer> getImplementedClientClusters() {
@@ -75,7 +74,8 @@ public class ZigBeeConverterBatteryVoltage extends ZigBeeBaseChannelConverter im
             if (bindResponse.isSuccess()) {
                 ZclAttribute attribute = serverCluster.getAttribute(ZclPowerConfigurationCluster.ATTR_BATTERYVOLTAGE);
                 // Configure reporting - no faster than once per ten minutes - no slower than every 2 hours.
-                CommandResult reportingResponse = attribute.setReporting(600, REPORTING_PERIOD_DEFAULT_MAX, 1).get();
+                CommandResult reportingResponse = serverCluster
+                        .setReporting(attribute, 600, REPORTING_PERIOD_DEFAULT_MAX, 1).get();
                 handleReportingResponse(reportingResponse, POLLING_PERIOD_HIGH, REPORTING_PERIOD_DEFAULT_MAX);
             }
         } catch (InterruptedException | ExecutionException e) {
@@ -86,15 +86,13 @@ public class ZigBeeConverterBatteryVoltage extends ZigBeeBaseChannelConverter im
     }
 
     @Override
-    public boolean initializeConverter(ZigBeeThingHandler thing) {
+    public boolean initializeConverter(ZigBeeBaseThingHandler thing) {
         super.initializeConverter(thing);
         cluster = (ZclPowerConfigurationCluster) endpoint.getInputCluster(ZclPowerConfigurationCluster.CLUSTER_ID);
         if (cluster == null) {
             logger.error("{}: Error opening power configuration cluster", endpoint.getIeeeAddress());
             return false;
         }
-
-        attribute = cluster.getAttribute(ZclPowerConfigurationCluster.ATTR_BATTERYVOLTAGE);
 
         // Add a listener, then request the status
         cluster.addAttributeListener(this);
@@ -110,7 +108,7 @@ public class ZigBeeConverterBatteryVoltage extends ZigBeeBaseChannelConverter im
 
     @Override
     public void handleRefresh() {
-        attribute.readValue(0);
+        cluster.getBatteryVoltage(0);
     }
 
     @Override
@@ -122,9 +120,21 @@ public class ZigBeeConverterBatteryVoltage extends ZigBeeBaseChannelConverter im
             return null;
         }
 
-        ZclAttribute attribute = powerCluster.getAttribute(ZclPowerConfigurationCluster.ATTR_BATTERYVOLTAGE);
-        if (attribute == null || attribute.readValue(Long.MAX_VALUE) == null) {
-            logger.trace("{}: Power configuration cluster battery voltage returned null", endpoint.getIeeeAddress());
+        try {
+            if (!powerCluster.discoverAttributes(false).get()
+                    && !powerCluster.isAttributeSupported(ZclPowerConfigurationCluster.ATTR_BATTERYVOLTAGE)) {
+                logger.trace("{}: Power configuration cluster battery voltage not supported",
+                        endpoint.getIeeeAddress());
+
+                return null;
+            } else if (powerCluster.getBatteryVoltage(Long.MAX_VALUE) == null) {
+                logger.trace("{}: Power configuration cluster battery voltage returned null",
+                        endpoint.getIeeeAddress());
+                return null;
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            logger.warn("{}: Exception discovering attributes in power configuration cluster",
+                    endpoint.getIeeeAddress(), e);
             return null;
         }
 
