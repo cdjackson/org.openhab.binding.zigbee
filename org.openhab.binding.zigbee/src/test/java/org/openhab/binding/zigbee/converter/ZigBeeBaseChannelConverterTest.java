@@ -23,7 +23,7 @@ import java.util.concurrent.Future;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
-import org.openhab.binding.zigbee.handler.ZigBeeThingHandler;
+import org.openhab.binding.zigbee.handler.ZigBeeGenericThingHandler;
 import org.openhab.binding.zigbee.internal.converter.ZigBeeConverterSwitchLevel;
 import org.openhab.core.library.types.DecimalType;
 import org.openhab.core.library.types.OnOffType;
@@ -101,7 +101,7 @@ public class ZigBeeBaseChannelConverterTest {
     public void monitorCommandResponse() throws InterruptedException, ExecutionException {
         ZigBeeBaseChannelConverter converter = new ZigBeeConverterSwitchLevel();
 
-        ZigBeeThingHandler thingHandler = Mockito.mock(ZigBeeThingHandler.class);
+        ZigBeeGenericThingHandler thingHandler = Mockito.mock(ZigBeeGenericThingHandler.class);
 
         converter.thing = thingHandler;
 

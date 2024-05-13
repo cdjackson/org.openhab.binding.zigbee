@@ -35,6 +35,7 @@ import com.zsmartsystems.zigbee.IeeeAddress;
 import com.zsmartsystems.zigbee.ZigBeeCommand;
 import com.zsmartsystems.zigbee.ZigBeeEndpoint;
 import com.zsmartsystems.zigbee.ZigBeeProfileType;
+import com.zsmartsystems.zigbee.ZigBeeStatus;
 import com.zsmartsystems.zigbee.zcl.ZclAttributeListener;
 import com.zsmartsystems.zigbee.zcl.ZclCluster;
 import com.zsmartsystems.zigbee.zcl.clusters.ZclOnOffCluster;
@@ -42,7 +43,7 @@ import com.zsmartsystems.zigbee.zcl.clusters.ZclOnOffCluster;
 /**
  * Unit tests for the {@link ZigBeeConverterTuyaButtonTest}.
  *
- * @author Daniel Schall - initial controbution.
+ * @author Daniel Schall - initial contribution.
  */
 public class ZigBeeConverterTuyaButtonTest {
 
@@ -87,7 +88,7 @@ public class ZigBeeConverterTuyaButtonTest {
     }
 
     @Test
-    public void testDisposalRemvoesListeners() {
+    public void testDisposalRemovesListeners() {
         ZclCluster cluster = mockCluster(ZclOnOffCluster.CLUSTER_ID);
         converter.initializeConverter(thingHandler);
         converter.disposeConverter();
@@ -180,8 +181,8 @@ public class ZigBeeConverterTuyaButtonTest {
     private ZclCluster mockCluster(int clusterId) {
         ZclCluster cluster = mock(ZclCluster.class);
         when(cluster.getClusterId()).thenReturn(clusterId);
-        when(cluster.bind(ArgumentMatchers.any(IeeeAddress.class), ArgumentMatchers.anyInt()))
-                .thenReturn(CompletableFuture.completedFuture(new CommandResult(new ZigBeeCommand())));
+        when(cluster.bind(ArgumentMatchers.any(IeeeAddress.class), ArgumentMatchers.anyInt())).thenReturn(
+                CompletableFuture.completedFuture(new CommandResult(ZigBeeStatus.SUCCESS, new ZigBeeCommand())));
         when(endpoint.getOutputCluster(clusterId)).thenReturn(cluster);
         when(endpoint.getInputCluster(clusterId)).thenReturn(cluster);
         return cluster;

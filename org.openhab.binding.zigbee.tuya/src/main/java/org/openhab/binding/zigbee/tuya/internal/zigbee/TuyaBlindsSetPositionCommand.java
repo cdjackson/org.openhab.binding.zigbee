@@ -20,10 +20,10 @@ public class TuyaBlindsSetPositionCommand extends ZclTuyaCommand {
     public void serialize(final ZclFieldSerializer serializer) {
         super.serialize(serializer);
 
-        serializer.serialize(0x02, ZclDataType.UNSIGNED_8_BIT_INTEGER);
-        serializer.serialize(0x02, ZclDataType.UNSIGNED_8_BIT_INTEGER);
-        serializer.serialize(0x00, ZclDataType.UNSIGNED_8_BIT_INTEGER);
-        serializer.serialize(0x04, ZclDataType.UNSIGNED_8_BIT_INTEGER);
+        serializer.serialize(0x02, ZclDataType.UNSIGNED_8_BIT_INTEGER);// dpid
+        serializer.serialize(0x02, ZclDataType.UNSIGNED_8_BIT_INTEGER);// type=value
+        serializer.serialize(0x00, ZclDataType.UNSIGNED_8_BIT_INTEGER);// len
+        serializer.serialize(0x04, ZclDataType.UNSIGNED_8_BIT_INTEGER);// len
         serializer.serialize(0x00, ZclDataType.UNSIGNED_8_BIT_INTEGER);
         serializer.serialize(0x00, ZclDataType.UNSIGNED_8_BIT_INTEGER);
         serializer.serialize(0x00, ZclDataType.UNSIGNED_8_BIT_INTEGER);
