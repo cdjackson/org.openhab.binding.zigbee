@@ -5,22 +5,22 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package com.zsmartsystems.zigbee.console;
+package org.openhab.binding.zigbee.tuya.console.internal;
 
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
+
+import org.openhab.binding.zigbee.tuya.internal.zigbee.cluster.DataQuery;
+import org.openhab.binding.zigbee.tuya.internal.zigbee.cluster.DataResponse;
+import org.openhab.binding.zigbee.tuya.internal.zigbee.cluster.McuSyncTime;
+import org.openhab.binding.zigbee.tuya.internal.zigbee.cluster.McuVersionRequest;
+import org.openhab.binding.zigbee.tuya.internal.zigbee.cluster.ZclTuyaSpecificCluster;
 
 import com.zsmartsystems.zigbee.ZigBeeEndpoint;
 import com.zsmartsystems.zigbee.ZigBeeNetworkManager;
-import com.zsmartsystems.zigbee.zcl.clusters.ZclTuyaSpecificCluster;
-import com.zsmartsystems.zigbee.zcl.clusters.tuyaspecific.DataQuery;
-import com.zsmartsystems.zigbee.zcl.clusters.tuyaspecific.DataResponse;
-import com.zsmartsystems.zigbee.zcl.clusters.tuyaspecific.McuSyncTime;
-import com.zsmartsystems.zigbee.zcl.clusters.tuyaspecific.McuVersionRequest;
+import com.zsmartsystems.zigbee.console.ZigBeeConsoleAbstractCommand;
 
 /**
  *
@@ -57,14 +57,12 @@ public class ZigBeeConsoleTuyaCommand extends ZigBeeConsoleAbstractCommand {
         }
 
         final ZigBeeEndpoint endpoint = getEndpoint(networkManager, args[1]);
-
-        ZclTuyaSpecificCluster cluster = (ZclTuyaSpecificCluster) endpoint
+        final ZclTuyaSpecificCluster cluster = (ZclTuyaSpecificCluster) endpoint
                 .getInputCluster(ZclTuyaSpecificCluster.CLUSTER_ID);
 
         boolean sync = false;
         boolean query = false;
         boolean version = false;
-        List<Integer> dpids = new ArrayList<>();
         for (int i = 2; i < args.length; i++) {
             switch (args[i].toLowerCase()) {
                 case "sync":
@@ -80,16 +78,16 @@ public class ZigBeeConsoleTuyaCommand extends ZigBeeConsoleAbstractCommand {
         }
 
         if (sync) {
-            McuSyncTime request = new McuSyncTime(1, (int) (System.currentTimeMillis() / 1000),
+            McuSyncTime request = new McuSyncTime((int) (System.currentTimeMillis() / 1000),
                     (int) (System.currentTimeMillis() / 1000));
             cluster.sendCommand(request);
         }
         if (query) {
-            DataQuery request = new DataQuery(1);
+            DataQuery request = new DataQuery();
             cluster.sendCommand(request);
         }
         if (version) {
-            McuVersionRequest request = new McuVersionRequest(1);
+            McuVersionRequest request = new McuVersionRequest();
             cluster.sendCommand(request);
         }
 

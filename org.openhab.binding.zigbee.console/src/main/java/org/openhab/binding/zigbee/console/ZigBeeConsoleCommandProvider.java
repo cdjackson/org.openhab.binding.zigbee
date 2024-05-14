@@ -33,6 +33,9 @@ public interface ZigBeeConsoleCommandProvider {
     /**
      * Returns a console command for the given name and applicable for the given bridge type, or null if no such command
      * is provided.
+     *
+     * @param commandName the command name to retrieve
+     * @param thingTypeUID the UID of the bridge
      */
     ZigBeeConsoleCommand getCommand(String commandName, ThingTypeUID thingTypeUID);
 

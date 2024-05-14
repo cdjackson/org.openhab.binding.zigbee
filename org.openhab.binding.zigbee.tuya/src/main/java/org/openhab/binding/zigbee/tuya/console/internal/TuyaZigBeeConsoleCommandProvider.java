@@ -16,7 +16,6 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
-import static org.openhab.binding.zigbee.telegesis.TelegesisBindingConstants.THING_TYPE_TELEGESIS;
 
 import java.util.Collection;
 import java.util.List;
@@ -27,34 +26,29 @@ import org.openhab.core.thing.ThingTypeUID;
 import org.osgi.service.component.annotations.Component;
 
 import com.zsmartsystems.zigbee.console.ZigBeeConsoleCommand;
-import com.zsmartsystems.zigbee.console.telegesis.TelegesisConsoleSecurityStateCommand;
 
 /**
- * This class provides ZigBee console commands for Ember dongles.
+ * This class provides ZigBee console commands for TuYa devices.
  *
- * @author Henning Sudbrock - initial contribution
- * @author Chris Jackson - added commands
+ * @author Chris Jackson - initial contribution
  */
 @Component(immediate = true)
 public class TuyaZigBeeConsoleCommandProvider implements ZigBeeConsoleCommandProvider {
 
-    public static final List<ZigBeeConsoleCommand> TELEGESIS_COMMANDS = unmodifiableList(
-            asList(new TelegesisConsoleSecurityStateCommand()));
+    public static final List<ZigBeeConsoleCommand> TUYA_COMMANDS = unmodifiableList(
+            asList(new ZigBeeConsoleTuyaCommand()));
 
-    private Map<String, ZigBeeConsoleCommand> telegesisCommands = TELEGESIS_COMMANDS.stream()
+    private Map<String, ZigBeeConsoleCommand> tuyaCommands = TUYA_COMMANDS.stream()
             .collect(toMap(ZigBeeConsoleCommand::getCommand, identity()));
 
     @Override
     public ZigBeeConsoleCommand getCommand(String commandName, ThingTypeUID thingTypeUID) {
-        if (THING_TYPE_TELEGESIS.equals(thingTypeUID)) {
-            return telegesisCommands.get(commandName);
-        } else {
-            return null;
-        }
+        return tuyaCommands.get(commandName);
+
     }
 
     @Override
     public Collection<ZigBeeConsoleCommand> getAllCommands() {
-        return TELEGESIS_COMMANDS;
+        return TUYA_COMMANDS;
     }
 }
