@@ -12,11 +12,11 @@ import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 
-import org.openhab.binding.zigbee.tuya.internal.zigbee.cluster.DataQuery;
-import org.openhab.binding.zigbee.tuya.internal.zigbee.cluster.DataResponse;
-import org.openhab.binding.zigbee.tuya.internal.zigbee.cluster.McuSyncTime;
-import org.openhab.binding.zigbee.tuya.internal.zigbee.cluster.McuVersionRequest;
-import org.openhab.binding.zigbee.tuya.internal.zigbee.cluster.ZclTuyaSpecificCluster;
+import org.openhab.binding.zigbee.tuya.internal.zigbee.DataQuery;
+import org.openhab.binding.zigbee.tuya.internal.zigbee.DataResponse;
+import org.openhab.binding.zigbee.tuya.internal.zigbee.McuSyncTime;
+import org.openhab.binding.zigbee.tuya.internal.zigbee.McuVersionRequest;
+import org.openhab.binding.zigbee.tuya.internal.zigbee.ZclTuyaSpecificCluster;
 
 import com.zsmartsystems.zigbee.ZigBeeEndpoint;
 import com.zsmartsystems.zigbee.ZigBeeNetworkManager;

@@ -21,36 +21,36 @@
         </channels>
         <representation-property>zigbee_macaddress</representation-property>
         <config-description>
-            <parameter name="tuyadpid_66" type="integer" min="0" max="28800">
+            <parameter name="tuya_dpid_66" type="integer" min="0" max="28800">
                 <label>Fade Time</label>
                 <description>Duration presence should remain true after initial detection</description>
                 <default>0</default>
             </parameter>
-            <parameter name="tuyadpid_02" type="integer" min="0" max="10">
+            <parameter name="tuya_dpid_02" type="integer" min="0" max="10">
                 <label>Motion Detection Sensitivity</label>
                 <default>false</default>
             </parameter>
-            <parameter name="tuyadpid_04" type="integer" min="0" max="10000">
+            <parameter name="tuya_dpid_04" type="integer" min="0" max="10000">
                 <label>Motion Detection Distance</label>
                 <default>false</default>
             </parameter>
-            <parameter name="tuyadpid_69" type="integer" min="0" max="10">
+            <parameter name="tuya_dpid_69" type="integer" min="0" max="10">
                 <label>Medium Motion Detection Sensitivity</label>
                 <default>false</default>
             </parameter>
-            <parameter name="tuyadpid_68" type="integer" min="0" max="6000">
+            <parameter name="tuya_dpid_68" type="integer" min="0" max="6000">
                 <label>Medium Motion Detection Distance</label>
                 <default>false</default>
             </parameter>
-            <parameter name="tuyadpid_6d" type="integer" min="0" max="10">
+            <parameter name="tuya_dpid_6d" type="integer" min="0" max="10">
                 <label>Near Motion Detection Sensitivity</label>
                 <default>false</default>
             </parameter>
-            <parameter name="tuyadpid_6c" type="integer" min="0" max="10">
+            <parameter name="tuya_dpid_6c" type="integer" min="0" max="10">
                 <label>Near Motion Detection Distance</label>
                 <default>false</default>
             </parameter>
-            <parameter name="tuyadpid_6b" type="boolean">
+            <parameter name="tuya_dpid_6b" type="boolean">
                 <label>LED Indicator State</label>
                 <options>
                     <option value="false">Disabled</option>

@@ -54,10 +54,6 @@ public class ZigBeeConverterTuyaButton extends ZigBeeBaseChannelConverter implem
 
     private ZclCluster clientCluster = null;
 
-    // Tuya devices sometimes send duplicate commands with the same tx id.
-    // We keep track of the last received Tx id and ignore the duplicate.
-    private Integer lastTxId = -1;
-
     @Override
     public Set<Integer> getImplementedClientClusters() {
         return Collections.singleton(ZclOnOffCluster.CLUSTER_ID);
@@ -158,10 +154,7 @@ public class ZigBeeConverterTuyaButton extends ZigBeeBaseChannelConverter implem
     @Override
     public boolean commandReceived(ZclCommand command) {
         logger.debug("{}: Received command {}", endpoint.getIeeeAddress(), command);
-        Integer thisTxId = command.getTransactionId();
-        if (lastTxId == thisTxId) {
-            logger.debug("{}: Ignoring duplicate command {}", endpoint.getIeeeAddress(), thisTxId);
-        } else if (command instanceof TuyaButtonPressCommand) {
+        if (command instanceof TuyaButtonPressCommand) {
             TuyaButtonPressCommand tuyaButtonPressCommand = (TuyaButtonPressCommand) command;
             thing.triggerChannel(channel.getUID(), getEventType(tuyaButtonPressCommand.getPressType()));
             clientCluster.sendDefaultResponse(command, ZclStatus.SUCCESS);
@@ -169,7 +162,6 @@ public class ZigBeeConverterTuyaButton extends ZigBeeBaseChannelConverter implem
             logger.warn("{}: Received unknown command {}", endpoint.getIeeeAddress(), command);
         }
 
-        lastTxId = thisTxId;
         return true;
     }
 

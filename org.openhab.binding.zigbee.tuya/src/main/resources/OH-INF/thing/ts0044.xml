@@ -58,6 +58,12 @@
 			</channel>
 
 		</channels>
+
+		<properties>
+			<property name="vendor">Tuya</property>
+			<property name="modelId">TS0044</property>
+			<property name="zigbee_logicaltype">END_DEVICE</property>
+		</properties>
 		
 		<representation-property>zigbee_macaddress</representation-property>
 

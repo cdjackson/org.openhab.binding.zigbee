@@ -5,7 +5,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.openhab.binding.zigbee.tuya.internal.zigbee.cluster;
+package org.openhab.binding.zigbee.tuya.internal.zigbee;
 
 import javax.annotation.Generated;
 
@@ -15,19 +15,18 @@ import com.zsmartsystems.zigbee.zcl.protocol.ZclCommandDirection;
 import com.zsmartsystems.zigbee.zcl.protocol.ZclDataType;
 
 /**
- * Data Query value object class.
+ * MCU Version Response value object class.
  * <p>
- * Cluster: <b>Tuya Specific</b>. Command ID 0x03 is sent <b>FROM</b> the server.
+ * Cluster: <b>Tuya Specific</b>. Command ID 0x11 is sent <b>FROM</b> the server.
  * This command is a <b>specific</b> command used for the Tuya Specific cluster.
  * <p>
- * The gateway sends a query to the ZigBee device for all the current information. The query does
- * not contain a ZCL payload. We recommend that you set a reporting policy on the ZigBee device to
- * avoid reporting all data in one task.
+ * The ZigBee module returns the MCU firmware version, or the MCU proactively reports its
+ * firmware version.
  * <p>
  * Code is auto-generated. Modifications may be overwritten!
  */
-@Generated(value = "com.zsmartsystems.zigbee.autocode.ZigBeeCodeGenerator", date = "2024-05-08T10:17:37Z")
-public class DataQuery extends ZclTuyaSpecificCommand {
+@Generated(value = "com.zsmartsystems.zigbee.autocode.ZigBeeCodeGenerator", date = "2024-05-08T10:06:37Z")
+public class McuVersionResponse extends ZclTuyaSpecificCommand {
     /**
      * The cluster ID to which this command belongs.
      */
@@ -36,36 +35,58 @@ public class DataQuery extends ZclTuyaSpecificCommand {
     /**
      * The command ID.
      */
-    public static int COMMAND_ID = 0x03;
+    public static int COMMAND_ID = 0x11;
 
     /**
-     * Default constructor.
-     *
+     * Version command message field.
      */
-    public DataQuery() {
+    private Integer version;
+
+    /**
+     * Constructor providing all required parameters.
+     *
+     * @param version {@link Integer} Version
+     */
+    public McuVersionResponse(Integer version) {
+
         clusterId = CLUSTER_ID;
         commandId = COMMAND_ID;
         genericCommand = false;
         commandDirection = ZclCommandDirection.SERVER_TO_CLIENT;
+
+        this.version = version;
+    }
+
+    /**
+     * Gets Version.
+     *
+     * @return the Version
+     */
+    public Integer getVersion() {
+        return version;
     }
 
     @Override
     public void serialize(final ZclFieldSerializer serializer) {
         serializer.serialize(sequenceNumber, ZclDataType.UNSIGNED_16_BIT_INTEGER);
+        serializer.serialize(version, ZclDataType.UNSIGNED_8_BIT_INTEGER);
     }
 
     @Override
     public void deserialize(final ZclFieldDeserializer deserializer) {
         sequenceNumber = deserializer.deserialize(ZclDataType.UNSIGNED_16_BIT_INTEGER);
+        version = deserializer.deserialize(ZclDataType.UNSIGNED_8_BIT_INTEGER);
     }
 
     @Override
     public String toString() {
-        final StringBuilder builder = new StringBuilder(46);
-        builder.append("DataQuery [");
+        final StringBuilder builder = new StringBuilder(82);
+        builder.append("McuVersionResponse [");
         builder.append(super.toString());
         builder.append(", sequenceNumber=");
         builder.append(sequenceNumber);
+        builder.append(", version=");
+        builder.append(version);
         builder.append(']');
         return builder.toString();
     }

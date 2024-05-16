@@ -20,7 +20,7 @@ import org.openhab.binding.zigbee.handler.ZigBeeBaseThingHandler;
 import org.openhab.binding.zigbee.handler.ZigBeeGenericThingHandler;
 import org.openhab.binding.zigbee.handler.ZigBeeIsAliveTracker;
 import org.openhab.binding.zigbee.tuya.TuyaBindingConstants;
-import org.openhab.binding.zigbee.tuya.handler.TuyaBlindsThingHandler;
+import org.openhab.binding.zigbee.tuya.handler.TuyaThingHandler;
 import org.openhab.core.config.core.ConfigDescriptionProvider;
 import org.openhab.core.thing.Thing;
 import org.openhab.core.thing.ThingTypeUID;
@@ -60,7 +60,7 @@ public class TuyaHandlerFactory extends BaseThingHandlerFactory {
 
         // Check for thing types with a custom thing handler
         if (thing.getThingTypeUID().equals(TuyaBindingConstants.THING_TYPE_TUYA_BLIND_AM25)) {
-            handler = new TuyaBlindsThingHandler(thing, zigbeeChannelConverterFactory, zigbeeIsAliveTracker);
+            handler = new TuyaThingHandler(thing, zigbeeChannelConverterFactory, zigbeeIsAliveTracker);
         } else {
             handler = new ZigBeeGenericThingHandler(thing, zigbeeChannelConverterFactory, zigbeeIsAliveTracker);
         }

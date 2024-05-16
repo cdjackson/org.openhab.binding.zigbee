@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010-2021 Contributors to the openHAB project
+ * Copyright (c) 2010-2024 Contributors to the openHAB project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -20,10 +20,10 @@ import com.zsmartsystems.zigbee.zcl.protocol.ZclCommandDirection;
 import com.zsmartsystems.zigbee.zcl.protocol.ZclDataType;
 
 /**
- * Manufacturer specific command for the Tuya button
+ * Command for Tuya buttons (e.g., Zemismart).
  *
  * @author Daniel Schall - initial contribution
- *
+ * @author Chris Jackson - minor updates and refactoring to separate bundle
  */
 public class TuyaButtonPressCommand extends ZclCommand {
     /**
@@ -40,19 +40,11 @@ public class TuyaButtonPressCommand extends ZclCommand {
      */
     private Integer pressType;
 
-    /**
-     * Default constructor.
-     *
-     */
-    public TuyaButtonPressCommand() {
+    public TuyaButtonPressCommand(Integer pressType) {
         clusterId = ZclOnOffCluster.CLUSTER_ID;
         commandId = COMMAND_ID;
         genericCommand = false;
         commandDirection = ZclCommandDirection.CLIENT_TO_SERVER;
-    }
-
-    public TuyaButtonPressCommand(Integer pressType) {
-        this();
         this.pressType = pressType;
     }
 
@@ -73,8 +65,7 @@ public class TuyaButtonPressCommand extends ZclCommand {
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder(113);
-        builder.append(this.getClass().getSimpleName());
-        builder.append(" [");
+        builder.append("TuyaButtonPressCommand [");
         builder.append(super.toString());
         builder.append(", pressType=");
         builder.append(pressType);

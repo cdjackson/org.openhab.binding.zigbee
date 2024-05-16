@@ -500,6 +500,61 @@ Firmware files downloaded from the repository are checked for integrity against 
 
 Currently the openHAB main UI doesn't support the firmware management system, so this must be performed using the console.
 
+## TuYa Devices
+
+The binding has support for TuYa data points which is a TuYa specific custom extension to the ZigBee protocol.
+
+
+
+
+
+### Defining TuYa devices
+
+#### TuYa Channels
+
+TuYa devices do provide support for the standard ZigBee protocol in many instances, and where possible, the standard ZigBee cluster functionality should be used. Sometimes, support is provided in both the standard ZigBee Cluster Library way, and also through the TuYa specific extensions, and unless there is additional functionality provided by using the custom function, the standard method should be used.
+
+Where it is necessary to use the custom function, it is still desirable to use the standard channel types. Channel properties are used to configure the binding
+
+An example definition using standard ZigBee functionality. The standard channel type is used so only the `zigbee_endpoint` property is required -:
+
+```
+            <channel id="motion" typeId="ias_motionpresence">
+                <properties>
+                    <property name="zigbee_endpoint">1</property>
+                </properties>
+            </channel>
+```
+ 
+ An example definition using a TuYa specific channel -:
+
+```
+            <channel id="motion" typeId="ias_motionpresence">
+                <properties>
+                    <property name="zigbee_endpoint">1</property>
+                    <property name="tuya_dpid">1</property>
+                    <property name="tuya_converter">1</property>
+                </properties>
+            </channel>
+```
+ 
+| Channel UID                  | ZigBee Cluster                           | Type                     | Description |
+| ---------------------------- | ---------------------------------------- | ------------------------ | ----------- |
+| tuya_button                | `POWER_CONFIGURATION` (0x0001)           | Number                   |             |
+ 
+
+#### Configuration Parameters
+
+Data points that are considered configuration parameters (i.e. those that configure the device, and are not normally required by the user) can be defined in the XML as per the standard openHAB configuration description, and using the name `tuya_dpid_XX` where `XX` is the hexadecimal representation of the datapoint ID as per the following example -:
+
+```
+            <parameter name="tuya_dpid_66" type="integer" min="0" max="28800">
+                <label>Fade Time</label>
+                <description>Duration presence should remain true after initial detection</description>
+                <default>0</default>
+            </parameter>
+```
+
 
 
 ## When things don't appear to be working
@@ -609,7 +664,7 @@ The following commands are available if the transport layer is using the Silabs 
 
 ### Xiaomi devices
 
-Xiaomi/Aqara devices are not fully ZigBee compliant, and are known to suffer from multiple problems.
+Xiaomi/Aqara/TuYa devices are not fully ZigBee compliant, and are known to suffer from multiple problems.
 
 #### Pairing
 
